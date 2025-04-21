@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rubiqs | Instructor Note Review</title>
+  <link rel="stylesheet" href="/static/rubiqs.css" />
+  <style>
+    a.button {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background-color: #1f3a54;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-right: 0.5rem;
+      white-space: nowrap;
+    }
+    a.button:hover {
+      background-color: #142835;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- Navigation Bar -->
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
+      <a href="/notes/dashboard" class="button">Dashboard</a>
+      <a href="/notes/create-assignment" class="button">Create Assignment</a>
+      <a href="/notes/assignment-review" class="button">Assignment Review</a>
+      <a href="/notes/launch?user_id=test123" class="button">Student View</a>
+    </div>
+
+    <div class="brand-header">
+      <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <img src="/static/rubiqs-logo.png" alt="Rubiqs Logo" class="logo" />
+        <div>
+          <h1 style="margin: 0; font-size: 1.5rem; color: #1f3a54;">Rubiqs</h1>
+          <div style="font-size: 1rem; color: #7f8c8d;">AI-Powered Mastery</div>
+          <div style="font-size: 0.85rem; color: #aaa;">by J. Baker Design</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="title">Review Student Notes</h2>
+
+    <div style="margin-bottom: 2rem;">
+        <a href="/notes/dashboard?tab=submissions&assignment_id={{ assignment_id }}" class="button">⬅ Back to Submissions</a>
+      </div>
+      
+    <div class="form-group wide">
+      <label>Student ID:</label>
+      <p>{{ user_id }}</p>
+    </div>
+
+    <div class="form-group wide">
+      <label>Saved Notes:</label>
+      <textarea rows="16" readonly>{{ saved_notes }}</textarea>
+    </div>
+
+    <h2 class="title">Add Inline Comment</h2>
+    <form method="POST" action="/notes/instructor?user_id={{ user_id }}&assignment_id={{ assignment_id }}">
+      <div class="form-group wide">
+        <label for="anchor_text">Select Text from Notes (Copy/Paste):</label>
+        <input type="text" name="anchor_text" placeholder="Paste student phrase here..." required />
+      </div>
+      <div class="form-group wide">
+        <label for="comment">Comment:</label>
+        <textarea name="comment" rows="4" placeholder="Leave your feedback..." required></textarea>
+      </div>
+      <button type="submit" class="submit">Add Comment</button>
+    </form>
+
+    {% if comments %}
+    <div class="form-group wide">
+      <label>Previous Comments:</label>
+      <ul style="background: #f9f9f9; border-radius: 8px; padding: 1rem;">
+        {% for c in comments %}
+          <li style="margin-bottom: 1rem;">
+            <strong>“{{ c.anchor }}”</strong><br />
+            {{ c.comment }}<br />
+            <span style="font-size: 0.85rem; color: #999;">{{ c.timestamp }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <h2 class="title">Submit Overall Feedback</h2>
+    <form method="POST" action="/notes/feedback?user_id={{ user_id }}&assignment_id={{ assignment_id }}">
+      <div class="form-group wide">
+        <label for="feedback">Leave Feedback:</label>
+        <textarea name="feedback" rows="5" placeholder="Optional feedback...">{{ saved_feedback }}</textarea>
+      </div>
+      <button type="submit" class="submit">Submit Feedback</button>
+    </form>
+  </div>
+</body>
+</html>

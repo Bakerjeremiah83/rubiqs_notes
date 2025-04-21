@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rubiqs | Page Title</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to right, #f1e2c4, #5ca198, #1f3a54);
+      color: #1f3a54;
+      margin: 0;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      width: 100%;
+      max-width: 1000px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      max-height: 80px;
+      width: auto;
+      margin-right: 1.5rem;
+    }
+
+    h2.title {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button.submit {
+      display: block;
+      margin: 2rem auto 0 auto;
+      background: #1f3a54;
+      color: white;
+      padding: 0.85rem 2rem;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button.submit:hover:not(:disabled) {
+      background: #142835;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand-header">
+      <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <img src="/static/rubiqs-logo.png" alt="Rubiqs Logo" class="logo" />
+        <div>
+          <h1 style="margin: 0; font-size: 1.5rem; color: #1f3a54;">Rubiqs</h1>
+          <div style="font-size: 1rem; color: #7f8c8d;">AI-Powered Mastery</div>
+          <div style="font-size: 0.85rem; color: #aaa;">by J. Baker Design</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="title">Page Title Goes Here</h2>
+
+    <!-- Your page content goes here -->
+    <div class="form-group">
+      <label for="example">Example Field</label>
+      <input type="text" id="example" name="example" />
+    </div>
+
+    <button class="submit">Submit</button>
+  </div>
+</body>
+</html>

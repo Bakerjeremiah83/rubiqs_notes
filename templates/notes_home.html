@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rubiqs | Student Notes</title>
+  <link rel="stylesheet" href="/static/rubiqs.css" />
+</head>
+<body>
+    
+  <div class="card">
+    <div class="brand-header">
+      <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <img src="/static/rubiqs-logo.png" alt="Rubiqs Logo" class="logo" />
+        <div>
+          <h1 style="margin: 0; font-size: 1.5rem; color: #1f3a54;">Rubiqs</h1>
+          <div style="font-size: 1rem; color: #7f8c8d;">AI-Powered Mastery</div>
+          <div style="font-size: 0.85rem; color: #aaa;">by J. Baker Design</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assignment Dropdown -->
+    <form method="GET" action="/notes/launch">
+      <div class="form-group wide">
+        <label for="assignment_id">Select Assignment:</label>
+        <select name="assignment_id" onchange="this.form.submit()">
+          <option value="">-- View Notes Without Assignment --</option>
+          {% for assignment in assignments %}
+            <option value="{{ assignment.id }}" {% if assignment.id == selected_assignment_id %}selected{% endif %}>
+              {{ assignment.title }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <input type="hidden" name="user_id" value="{{ user_id }}">
+    </form>
+
+    {% if assignment_prompt %}
+    <div class="form-group wide">
+        <label>Prompt:</label>
+        <div style="background: #f3f3f3; padding: 1rem; border-radius: 8px;">
+        {{ assignment_prompt | safe }}
+        </div>
+    </div>
+    {% endif %}
+
+    <h2 class="title">My Course Notes</h2>
+
+    <form method="POST" action="/notes/launch?user_id={{ user_id }}&assignment_id={{ selected_assignment_id }}">
+      <div class="form-group wide">
+        <label for="notes">Take notes for this course:</label>
+        <textarea name="notes" rows="10" placeholder="Start typing...">{{ saved_notes }}</textarea>
+
+        {% if inline_comments %}
+        <div class="form-group wide">
+          <label>Instructor Comments Inline:</label>
+          <div style="background: #f9f9f9; padding: 1rem; border-radius: 8px;">
+            {{ highlighted_notes | safe }}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="submit">Save Notes</button>
+    </form>
+
+    {% if selected_assignment_id and not is_submitted %}
+      <form method="POST" action="/notes/launch?user_id={{ user_id }}&assignment_id={{ selected_assignment_id }}">
+        <input type="hidden" name="action" value="submit">
+        <button type="submit" class="submit">Submit Assignment</button>
+      </form>
+    {% elif is_submitted %}
+      <div class="form-group wide">
+        <label>Status:</label>
+        <div style="background: #dff0d8; padding: 1rem; border-radius: 8px;">✅ Assignment Submitted</div>
+      </div>
+    {% endif %}
+
+    {% if saved_feedback %}
+      <div class="form-group wide">
+        <label>Instructor Feedback:</label>
+        <div style="background: #f3f3f3; padding: 1rem; border-radius: 8px;">
+          {{ saved_feedback }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

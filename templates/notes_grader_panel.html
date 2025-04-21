@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rubiqs | Instructor Review + Grader</title>
+  <link rel="stylesheet" href="/static/rubiqs.css" />
+  <style>
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+    }
+
+    .note-panel {
+      flex: 2;
+    }
+
+    .grader-panel {
+      flex: 1;
+      background: #f9f9f9;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 2rem;
+      height: fit-content;
+    }
+
+    .score-input {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1.1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+    
+  <div class="card">
+    <div class="brand-header">
+      <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <img src="/static/rubiqs-logo.png" alt="Rubiqs Logo" class="logo" />
+        <div>
+          <h1 style="margin: 0; font-size: 1.5rem; color: #1f3a54;">Rubiqs</h1>
+          <div style="font-size: 1rem; color: #7f8c8d;">AI-Powered Mastery</div>
+          <div style="font-size: 0.85rem; color: #aaa;">by J. Baker Design</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="title">Instructor Review</h2>
+
+    <div class="main-layout">
+      <!-- Notes + Comments -->
+      <div class="note-panel">
+        <div class="form-group wide">
+          <label>Student ID:</label>
+          <p>{{ user_id }}</p>
+        </div>
+
+        <div class="form-group wide">
+          <label>Submitted Notes:</label>
+          <div style="background: #fff; border: 1px solid #ccc; padding: 1rem; border-radius: 6px;">
+            {{ highlighted_notes | safe }}
+          </div>
+        </div>
+
+        {% if comments %}
+        <div class="form-group wide">
+          <label>Inline Comments:</label>
+          <ul style="background: #f9f9f9; padding: 1rem; border-radius: 8px;">
+            {% for c in comments %}
+            <li style="margin-bottom: 1rem;">
+              <strong>“{{ c.anchor }}”</strong><br />
+              {{ c.comment }}<br />
+              <span style="font-size: 0.85rem; color: #999;">{{ c.timestamp }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Grader Panel -->
+      <div class="grader-panel">
+        <h3 style="margin-top: 0;">Rubiqs Grader</h3>
+
+        <form method="POST" action="/notes/submit-grade">
+          <div class="form-group">
+            <label for="score">Score (out of 10):</label>
+            <input type="number" step="0.1" max="10" name="score" class="score-input" required>
+          </div>
+
+          <div class="form-group">
+            <label for="ai_feedback">Rubiqs AI Feedback:</label>
+            <textarea name="ai_feedback" rows="6" placeholder="AI-generated comments...">{{ ai_feedback }}</textarea>
+          </div>
+
+          <input type="hidden" name="user_id" value="{{ user_id }}">
+          <input type="hidden" name="assignment_id" value="{{ assignment_id }}">
+          <button type="submit" class="submit">Submit Grade</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

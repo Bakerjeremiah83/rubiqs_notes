@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rubiqs | Assignment Review</title>
+  <link rel="stylesheet" href="/static/rubiqs.css" />
+  <style>
+    .status-badge {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: white;
+    }
+    .submitted {
+      background-color: #2ecc71;
+    }
+    .not-submitted {
+      background-color: #e74c3c;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #1f3a54;
+      color: white;
+    }
+    a.button {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background-color: #1f3a54;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-right: 0.5rem;
+      white-space: nowrap;
+    }
+    a.button:hover {
+      background-color: #142835;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <!-- Navigation Bar -->
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
+      <a href="/notes/dashboard" class="button">Dashboard</a>
+      <a href="/notes/create-assignment" class="button">Create Assignment</a>
+      <a href="/notes/assignment-review" class="button">Assignment Review</a>
+      <a href="/notes/launch?user_id=test123" class="button">Student View</a>
+    </div>
+
+    <div class="brand-header">
+      <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <img src="/static/rubiqs-logo.png" alt="Rubiqs Logo" class="logo" />
+        <div>
+          <h1 style="margin: 0; font-size: 1.5rem; color: #1f3a54;">Rubiqs</h1>
+          <div style="font-size: 1rem; color: #7f8c8d;">AI-Powered Mastery</div>
+          <div style="font-size: 0.85rem; color: #aaa;">by J. Baker Design</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="title">Assignment Review Dashboard</h2>
+
+    {% for assignment in assignments %}
+      <h3 style="margin-top: 2rem;">📘 {{ assignment.title }}</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Student ID</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student_id in students %}
+          <tr>
+            <td>{{ student_id }}</td>
+            <td>
+              {% if submission_map[assignment.id][student_id] %}
+                <span class="status-badge submitted">✅ Submitted</span>
+              {% else %}
+                <span class="status-badge not-submitted">❌ Not Submitted</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if submission_map[assignment.id][student_id] %}
+                <a class="button" href="/notes/instructor?user_id={{ student_id }}&assignment_id={{ assignment.id }}">View Notes</a>
+                <a class="button" href="/notes/grade?user_id={{ student_id }}&assignment_id={{ assignment.id }}">Grade with Rubiqs</a>
+              {% else %}
+                <span style="color: #aaa;">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rubiqs | Notes Feed</title>
+  <link rel="stylesheet" href="/static/rubiqs.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 2rem;
+      max-width: 100%;
+    }
+
+    .feed-wrapper {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      box-sizing: border-box;
+    }
+
+    .feed-header {
+      background: #1f3a54;
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .header-flex {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .rubiqs-logo {
+      height: 80px;
+      width: auto;
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 80px;
+    }
+
+    .header-text h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: white;
+    }
+
+    .header-text p {
+      margin: 0;
+      font-size: 1rem;
+      color: #cbd5e1;
+    }
+
+    .feed-container {
+      background: white;
+      padding: 2.5rem 3rem;
+      border-radius: 16px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .entry {
+      width: 100%;
+      margin-bottom: 2rem;
+      padding: 1.25rem 1.5rem;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+
+    .entry.note {
+      background: #dbeafe;
+      max-height: 4.5rem;
+      overflow: hidden;
+      cursor: pointer;
+      transition: max-height 0.3s ease;
+    }
+
+    .entry.note.expanded {
+      max-height: 1000px;
+    }
+
+    .entry.assignment {
+      background: #fef3c7;
+    }
+
+    .entry.response {
+      background: #ecfccb;
+    }
+
+    .entry .timestamp {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 0.5rem;
+    }
+
+    .assignment-question {
+      margin-bottom: 1rem;
+    }
+
+    .assignment-question textarea {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    .submit-button {
+      margin-top: 1rem;
+      background-color: #1f3a54;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tab-button {
+      padding: 0.75rem 1.5rem;
+      background-color: #1f3a54;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background-color: #142835;
+    }
+
+    .tab-button:focus {
+      outline: none;
+    }
+
+    .note-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .note-body {
+      margin-top: 0.25rem;
+    }
+
+    .expand-indicator {
+      font-size: 0.75rem;
+      color: #666;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .entry.note.expanded .expand-indicator {
+      display: none;
+    }
+
+    .comment-thread {
+      margin-top: 1rem;
+      background: #f0f0f0;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+    }
+
+    .comment-thread .reply-form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="feed-wrapper">
+
+    <!-- Banner -->
+    <div class="feed-header">
+      <div class="header-flex">
+        <img src="/static/rubiqs-logo.png" alt="Rubiqs Logo" class="rubiqs-logo" />
+        <div class="header-text">
+          <h1>Rubiqs Notes</h1>
+          <p>This is your personal study thread. All notes, reflections, and note-taking assignments for this course will appear here in one continuous place — just like a conversation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Feed -->
+    <div class="feed-container">
+      {% for item in thread %}
+
+        {% if item.type == 'note' %}
+          <div class="entry note">
+            <div class="note-header">
+              <strong>Note:</strong>
+              <span class="expand-indicator">Click to expand ⬇</span>
+            </div>
+            <div class="note-body">{{ item.text }}</div>
+
+            {% if item.comments %}
+              <div class="comment-thread">
+                {% for c in item.comments %}
+                  <div style="font-size: 0.9rem; color: #333; margin-bottom: 1rem;">
+                    💬 <em>{{ c.text }}</em><br>
+                    <span style="font-size: 0.75rem; color: #888;">{{ c.timestamp }}</span>
+
+                    {% if c.replies %}
+                      <div style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid #ccc;">
+                        {% for r in c.replies %}
+                          <div style="margin-bottom: 0.25rem;">
+                            🗣️ <strong>{{ r.author.capitalize() }}:</strong> {{ r.text }}<br>
+                            <span style="font-size: 0.7rem; color: #888;">{{ r.timestamp }}</span>
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+
+                    {% if not instructor_mode %}
+                      <form method="POST" action="/notes/reply" class="reply-form" style="margin-top: 0.5rem;">
+                        <input type="hidden" name="user_id" value="{{ user_id }}">
+                        <input type="hidden" name="note_timestamp" value="{{ item.timestamp }}">
+                        <input type="hidden" name="comment_timestamp" value="{{ c.timestamp }}">
+                        <textarea name="reply" rows="2" placeholder="Write a reply..."></textarea>
+                        <button type="submit" class="submit-button">Reply</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="timestamp">{{ item.timestamp }}</div>
+
+            {% if instructor_mode %}
+              <form method="POST" action="/notes/comment" style="margin-top: 1rem;">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <input type="hidden" name="note_timestamp" value="{{ item.timestamp }}">
+                <textarea name="comment" rows="2" placeholder="Add a comment..." style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;"></textarea>
+                <button type="submit" class="submit-button">Add Comment</button>
+              </form>
+            {% endif %}
+          </div>
+
+        {% elif item.type == 'assignment' %}
+          <div class="entry assignment">
+            <div><strong>{{ item.title }}</strong></div>
+
+            {% for q in item.prompt %}
+              <div class="assignment-question">{{ q }}</div>
+            {% endfor %}
+
+            {% if item.assignment_id not in submitted_assignments %}
+              <form method="POST" action="/notes/respond?assignment_id={{ item.assignment_id }}&user_id={{ user_id }}">
+                {% for q in item.prompt %}
+                  <div class="assignment-question">
+                    <label>{{ q }}</label>
+                    <textarea name="q{{ loop.index }}" rows="3" placeholder="Your answer..."></textarea>
+                  </div>
+                {% endfor %}
+                <button type="submit" class="submit-button">Submit Assignment</button>
+              </form>
+
+            {% elif item.assignment_id in response_map %}
+              <div class="entry response" style="margin-top: 1.5rem;">
+                <div><strong>Your Response:</strong></div>
+                {% for qid, answer in response_map[item.assignment_id].answers.items() %}
+                  <p>{{ qid }}. {{ answer }}</p>
+                {% endfor %}
+                <div class="timestamp">{{ response_map[item.assignment_id].timestamp }}</div>
+              </div>
+
+            {% else %}
+              <div style="margin-top: 1rem; color: green; font-weight: bold;">✅ Assignment Submitted</div>
+            {% endif %}
+
+            <div class="timestamp">{{ item.timestamp }}</div>
+          </div>
+
+        {% elif item.type == 'response' %}
+          <div class="entry response">
+            <div><strong>Your Response:</strong></div>
+            {% for qid, answer in item.answers.items() %}
+              <p>{{ qid }}. {{ answer }}</p>
+            {% endfor %}
+            <div class="timestamp">{{ item.timestamp }}</div>
+          </div>
+        {% endif %}
+
+      {% endfor %}
+    </div>
+
+    <!-- Note Entry Form -->
+    <form method="POST" action="/notes/add-note?user_id={{ user_id }}">
+      <textarea name="note" rows="4" class="form-control" placeholder="Add a new note..." style="width: 100%; padding: 0.75rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc;"></textarea>
+      <button type="submit" class="submit-button" style="margin-top: 1rem;">Add Note</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('.entry.note').forEach(note => {
+        note.addEventListener('click', () => {
+          note.classList.toggle('expanded');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

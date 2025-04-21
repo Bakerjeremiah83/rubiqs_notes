@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rubiqs | Create Assignment</title>
+  <link rel="stylesheet" href="/static/rubiqs.css" />
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background-color: #1f3a54;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      margin-right: 0.5rem;
+      white-space: nowrap;
+    }
+
+    a.button:hover {
+      background-color: #142835;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- Navigation Bar -->
+    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
+      <a href="/notes/dashboard" class="button">Dashboard</a>
+      <a href="/notes/create-assignment" class="button">Create Assignment</a>
+      <a href="/notes/assignment-review" class="button">Assignment Review</a>
+      <a href="/notes/launch?user_id=test123" class="button">Student View</a>
+    </div>
+
+    <div class="brand-header">
+      <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <img src="/static/rubiqs-logo.png" alt="Rubiqs Logo" class="logo" />
+        <div>
+          <h1 style="margin: 0; font-size: 1.5rem; color: #1f3a54;">Rubiqs</h1>
+          <div style="font-size: 1rem; color: #7f8c8d;">AI-Powered Mastery</div>
+          <div style="font-size: 0.85rem; color: #aaa;">by J. Baker Design</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="title">Create New Assignment</h2>
+
+    <form method="POST">
+      <div class="form-group wide">
+        <label for="title">Assignment Title:</label>
+        <input type="text" name="title" class="form-control" required />
+      </div>
+
+      <div class="form-group wide">
+        <label>Need help? Use Rubiqs Copilot:</label>
+        <div style="display: flex; gap: 1rem;">
+          <textarea id="copilot-prompt" class="form-control" placeholder="Describe what you want..." rows="2" style="resize: vertical;"></textarea>
+          <button type="button" class="submit" onclick="generatePrompt()">✨ Generate</button>
+        </div>
+      </div>
+
+      <!-- Copilot Loading Spinner -->
+      <div id="copilot-loading" style="display:none; text-align: center; margin-top: 1rem;">
+        <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #1f3a54; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+        <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">Rubiqs Copilot is thinking...</p>
+      </div>
+
+      <div class="form-group wide">
+        <label for="prompt">Optional Prompt:</label>
+        <textarea name="prompt" rows="6" placeholder="Write instructions for students..."></textarea>
+      </div>
+
+      <button type="submit" class="submit">Create Assignment</button>
+    </form>
+  </div>
+
+  <script>
+    function generatePrompt() {
+      const input = document.getElementById('copilot-prompt').value;
+      const loading = document.getElementById('copilot-loading');
+      loading.style.display = 'block';
+
+      fetch('/notes/copilot-generate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ query: input })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.querySelector('textarea[name="prompt"]').value = data.prompt;
+      })
+      .catch(err => alert('Something went wrong: ' + err))
+      .finally(() => {
+        loading.style.display = 'none';
+      });
+    }
+
+    document.querySelectorAll('textarea').forEach(textarea => {
+      textarea.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+      });
+    });
+  </script>
+</body>
+</html>
