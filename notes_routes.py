@@ -22,8 +22,10 @@ from notes_storage import (
 
 notes_bp = Blueprint('notes', __name__)
 instructor_bp = Blueprint('instructor_dashboard', __name__)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
+DATA_DIR = "rubiqs_notes/data"
 
 @notes_bp.route('/dashboard')
 def instructor_dashboard():
@@ -151,6 +153,8 @@ def grade_notes():
                 f'💬 {c["comment"]}</span>'
             )
             highlighted_notes = highlighted_notes.replace(c["anchor"], comment_html, 1)
+
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     response = client.chat.completions.create(
         model="gpt-4",
