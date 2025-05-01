@@ -85,7 +85,7 @@
       const loading = document.getElementById('copilot-loading');
       loading.style.display = 'block';
 
-      fetch('/notes/copilot-generate', {
+      fetch('/notes/prompt-generate', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ query: input })

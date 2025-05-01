@@ -154,9 +154,7 @@ def grade_notes():
             )
             highlighted_notes = highlighted_notes.replace(c["anchor"], comment_html, 1)
 
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
-    response = client.chat.completions.create(
+    response = OpenAI(api_key=os.getenv("OPENAI_API_KEY")).chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are an educational writing assistant. Analyze the following student notes and provide helpful, rubric-aligned feedback."},
@@ -198,9 +196,8 @@ def submit_grade():
 
     return redirect(url_for('assignment_review.assignment_review_dashboard'))
 
-@notes_bp.route('/copilot-generate', methods=['POST'])
-def copilot_generate():
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+@notes_bp.route('/prompt-generate', methods=['POST'])
+def prompt_generate():
     data = request.get_json()
     topic = data.get('query', '')
     prompt_type = data.get('type', 'study_guide')
@@ -217,7 +214,7 @@ def copilot_generate():
     else:
         instruction = "Create an instructional support prompt."
 
-    response = client.chat.completions.create(
+    response = OpenAI(api_key=os.getenv("OPENAI_API_KEY")).chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": f"You are Rubiqs Copilot, an instructional assistant. {instruction}"},
@@ -227,6 +224,7 @@ def copilot_generate():
 
     result = response.choices[0].message.content.strip()
     return jsonify({'prompt': result})
+
 
 @notes_bp.route('/create-assignment', methods=['POST'])
 def create_assignment():

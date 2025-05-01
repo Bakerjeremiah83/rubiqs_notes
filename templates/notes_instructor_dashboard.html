@@ -271,7 +271,7 @@
 
       if (!topic) return alert("Please enter a topic for AI to generate.");
 
-      fetch("/notes/copilot-generate", {
+      fetch("/notes/prompt-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: topic, type: "reflection_prompt" })
