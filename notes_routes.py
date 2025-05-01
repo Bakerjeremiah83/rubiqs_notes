@@ -501,31 +501,3 @@ def update_note_route():
         json.dump(thread, f, indent=2)
 
     return jsonify({'success': True})
-
-@notes_bp.route('/login', methods=['POST'])
-def login():
-    iss = request.form.get("iss")
-    login_hint = request.form.get("login_hint")
-    target_link_uri = request.form.get("target_link_uri")
-    client_id = request.form.get("client_id")
-    lti_message_hint = request.form.get("lti_message_hint")
-
-    if not all([iss, login_hint, target_link_uri, client_id]):
-        return "Missing login parameters", 400
-
-    # Look up platform info
-    platform = PLATFORMS.get("moodle")  # or loop/match like you do in /launch
-
-    redirect_url = (
-        f"{platform['auth_login_url']}?"
-        f"scope=openid&"
-        f"response_type=id_token&"
-        f"client_id={client_id}&"
-        f"redirect_uri={target_link_uri}&"
-        f"login_hint={login_hint}&"
-        f"lti_message_hint={lti_message_hint}&"
-        f"response_mode=form_post&"
-        f"prompt=none"
-    )
-
-    return redirect(redirect_url)
