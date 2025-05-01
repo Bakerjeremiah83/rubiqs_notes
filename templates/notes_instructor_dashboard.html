@@ -101,12 +101,20 @@
       border-radius: 8px;
       cursor: pointer;
     }
-    .image-preview {
-      margin-bottom: 1rem;
+    .prompt-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
     }
-    .image-preview img {
-      max-width: 100%;
-      border-radius: 10px;
+    .prompt-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ai-input {
+      flex-grow: 1;
     }
   </style>
 </head>
@@ -134,25 +142,36 @@
 
     <div id="assignmentsPanel" class="tab-panel">
       <h2 class="section-heading">Create a New Assignment</h2>
-      <form method="POST" action="/notes/create-assignment" enctype="multipart/form-data">
+      <form method="POST" action="/notes/create-assignment" enctype="multipart/form-data" onsubmit="tinymce.triggerSave();">
         <label class="label-heading">Course, Module, Lesson:</label>
         <input type="text" name="course_module_lesson" placeholder="e.g., History-041, Module 3, Lessons 1–3" class="form-input" required>
 
         <label for="title" class="label-heading">Assignment Title:</label>
         <input type="text" id="title" name="title" class="form-input" required>
 
+        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="flex: 1;">
+              <label class="label-heading">Due By:</label>
+              <input type="date" name="due_date" class="form-input">
+            </div>
+            <div style="flex: 1;">
+              <label class="label-heading">Post On:</label>
+              <input type="datetime-local" name="post_date" class="form-input">
+            </div>
+          </div>
+
         <label class="label-heading">Prompts:</label>
         <div id="prompt-container">
-          <textarea name="prompt[]" class="form-textarea rich-text"></textarea>
+          <div class="prompt-block">
+            <textarea name="prompt[]" class="form-textarea rich-text"></textarea>
+            <div class="prompt-actions">
+              <input type="text" class="form-input ai-input" placeholder="Enter a topic for AI to generate this prompt">
+              <button type="button" class="submit-button" onclick="generatePromptWithAI(this)">✨ Generate with AI</button>
+            </div>
+          </div>
         </div>
-        <button type="button" class="submit-button" onclick="addPromptField()">➕ Add Question</button>
 
-        <button type="button" class="submit-button" onclick="generatePromptWithAI()">✨ Generate with AI</button>
-
-        <label for="image" class="label-heading">Attach Image (optional):</label>
-        <input type="file" id="image" name="image" accept="image/*" class="form-input" onchange="previewImage(event)">
-
-        <div class="image-preview" id="imagePreview"></div>
+        <button type="button" class="submit-button" style="margin: 1rem 0;" onclick="addPromptField()">➕ Add Question</button>
 
         <button type="submit" class="submit-button">Save and Push to Feed</button>
       </form>
@@ -217,28 +236,53 @@
     }
 
     function addPromptField() {
-      const container = document.getElementById('prompt-container');
-      const newField = document.createElement('textarea');
-      newField.className = 'form-textarea rich-text';
-      newField.name = 'prompt[]';
-      container.appendChild(newField);
-      tinymce.init({ selector: '.rich-text' });
-    }
+        const container = document.getElementById('prompt-container');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'prompt-block';
 
-    function previewImage(event) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        const img = document.createElement('img');
-        img.src = reader.result;
-        const preview = document.getElementById('imagePreview');
-        preview.innerHTML = '';
-        preview.appendChild(img);
-      }
-      reader.readAsDataURL(event.target.files[0]);
-    }
+        // Create unique ID
+        const uniqueId = 'editor-' + Date.now();
 
-    function generatePromptWithAI() {
-      alert("✨ This will eventually generate prompts using GPT-4 Copilot.");
+        wrapper.innerHTML = `
+            <textarea id="${uniqueId}" name="prompt[]" class="form-textarea rich-text"></textarea>
+            <div class="prompt-actions">
+            <input type="text" class="form-input ai-input" placeholder="Enter a topic for AI to generate this prompt">
+            <button type="button" class="submit-button" onclick="generatePromptWithAI(this)">✨ Generate with AI</button>
+            </div>
+        `;
+        container.appendChild(wrapper);
+
+        // Reinitialize TinyMCE on the new editor only
+        tinymce.init({
+            selector: `#${uniqueId}`,
+            plugins: 'image table lists link',
+            toolbar: 'undo redo | bold italic | fontsize forecolor | alignleft aligncenter alignright | bullist numlist | table | link image',
+            menubar: false
+        });
+        }
+
+
+    function generatePromptWithAI(button) {
+      const container = button.closest('.prompt-block');
+      const input = container.querySelector('.ai-input');
+      const topic = input.value.trim();
+      const editorId = container.querySelector('textarea').id;
+      const editor = tinymce.get(editorId);
+
+      if (!topic) return alert("Please enter a topic for AI to generate.");
+
+      fetch("/notes/copilot-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: topic, type: "reflection_prompt" })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (editor) {
+          editor.setContent(data.prompt);
+        }
+      })
+      .catch(err => alert("Error generating prompt."));
     }
   </script>
 </body>

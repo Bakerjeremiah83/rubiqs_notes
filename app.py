@@ -8,9 +8,9 @@ app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
 app.register_blueprint(notes_bp, url_prefix='/notes')
-app.register_blueprint(instructor_bp)  # no prefix, route includes /notes/...
+app.register_blueprint(instructor_bp, url_prefix='/instructor')
+app.register_blueprint(review_bp, url_prefix='/review')
 
-app.register_blueprint(review_bp)
 
 
 if __name__ == '__main__':

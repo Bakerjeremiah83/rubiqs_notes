@@ -13,9 +13,11 @@ from datetime import datetime
 
 
 from notes_storage import (
-    load_notes, save_notes, save_feedback, load_feedback, get_last_saved,
-    load_assignments, submit_assignment, is_assignment_submitted,
-    load_inline_comments, get_all_note_users, count_note_submissions, save_assignment
+    load_notes, save_notes, save_feedback, load_feedback,
+    get_last_saved, load_assignments, submit_assignment,
+    is_assignment_submitted, load_inline_comments,
+    get_all_note_users, count_note_submissions, save_assignment,
+    save_to_thread
 )
 
 notes_bp = Blueprint('notes', __name__)
@@ -31,7 +33,7 @@ def instructor_dashboard():
 
     submission_map = {}
     for a in assignments:
-        a_id = a['id']
+        a_id = a.get('assignment_id') or a.get('id')
         submission_map[a_id] = {}
         for student_id in students:
             submitted = is_assignment_submitted(student_id, a_id)
@@ -225,7 +227,7 @@ def copilot_generate():
 @notes_bp.route('/create-assignment', methods=['POST'])
 def create_assignment():
     title = request.form.get('title')
-    prompt = request.form.get('prompt')
+    prompt = request.form.getlist('prompt[]')
     image_url = request.form.get('image_url', '')
     lms_assignment_id = request.form.get('lms_assignment_id', '')
 
@@ -239,7 +241,7 @@ def create_assignment():
 
     submission_map = {}
     for a in assignments:
-        a_id = a['id']
+        a_id = a.get('assignment_id') or a.get('id')
         submission_map[a_id] = {}
         for student_id in students:
             submitted = is_assignment_submitted(student_id, a_id)
@@ -310,8 +312,12 @@ def view_feed():
 
 @notes_bp.route('/respond', methods=['POST'])
 def submit_assignment_response():
-    user_id = request.args.get('user_id')
-    assignment_id = request.args.get('assignment_id')
+    user_id = request.form.get('user_id')
+    assignment_id = request.form.get('assignment_id')
+
+    print("📤 DEBUG – Received form submission:")
+    print("user_id:", user_id)
+    print("assignment_id:", assignment_id)
 
     if not user_id or not assignment_id:
         return "Missing user ID or assignment ID", 400
@@ -454,4 +460,43 @@ def push_assignment_to_feed(assignment_id):
 
     return redirect(url_for('instructor_dashboard.instructor_dashboard'))
 
+@notes_bp.route('/update-note', methods=['POST'])
+def update_note_route():
+    print("✅ Reached update_note_route")
+
+    if request.is_json:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        timestamp = data.get('timestamp')
+        updated_text = data.get('updated_text')
+        updated_title = data.get('updated_title') or ""
+
+    else:
+        user_id = request.form.get('user_id')
+        timestamp = request.form.get('timestamp')
+        updated_text = request.form.get('text')
+
+    if not all([user_id, timestamp, updated_text]):
+        return jsonify({'error': 'Missing data'}), 400
+
+    path = f"{DATA_DIR}/{user_id}_thread.json"
+    if not os.path.exists(path):
+        return jsonify({'error': 'No thread found'}), 404
+
+    with open(path, 'r') as f:
+        thread = json.load(f)
+
+    for entry in thread:
+        if entry.get('type') == 'note' and entry.get('timestamp') == timestamp:
+            entry['text'] = updated_text
+            entry['title'] = updated_title
+
+            break
+    else:
+        return jsonify({'error': 'Note not found'}), 404
+
+    with open(path, 'w') as f:
+        json.dump(thread, f, indent=2)
+
+    return jsonify({'success': True})
 

@@ -85,9 +85,9 @@ def save_assignment(title, prompt, image_url, lms_assignment_id=""):
     assignment_id = f"a{len(assignments) + 1}"
 
     new_assignment = {
-        "id": assignment_id,
+        "assignment_id": assignment_id,
         "title": title,
-        "prompt": prompt.splitlines(),
+        "prompt": prompt if isinstance(prompt, list) else [prompt],
         "image_url": image_url,
         "lms_assignment_id": lms_assignment_id,
         "created_at": datetime.now().isoformat(),
@@ -117,10 +117,10 @@ def submit_assignment(user_id, assignment_id, answers):
         json.dump(data, f, indent=2)
 
 def load_thread(user_id):
-    # Load student notes first
-    base_file = f"{DATA_DIR}/{user_id}.json"
     thread = []
 
+    # Load base student note
+    base_file = f"{DATA_DIR}/{user_id}.json"
     if os.path.exists(base_file):
         with open(base_file, "r") as f:
             content = json.load(f)
@@ -130,11 +130,36 @@ def load_thread(user_id):
                 "timestamp": content.get("timestamp", "")
             })
 
+    # Load threaded notes (new entries)
+    thread_file = f"{DATA_DIR}/{user_id}_thread.json"
+    if os.path.exists(thread_file):
+        with open(thread_file, "r") as f:
+            thread.extend(json.load(f))
+
     # Add pushed assignments
     assignments = load_assignments()
     thread.extend(assignments)
 
+    thread.sort(key=lambda x: x.get("timestamp", ""), reverse=False)
+
     return thread
+
+
 
 def count_note_submissions():
     return len([f for f in os.listdir(DATA_DIR) if f.endswith("_submitted.json")])
+
+def save_to_thread(user_id, entry):
+    filename = f"{DATA_DIR}/{user_id}_thread.json"
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            thread = json.load(f)
+    else:
+        thread = []
+
+    thread.append(entry)
+
+    with open(filename, "w") as f:
+        json.dump(thread, f, indent=2)
+
+

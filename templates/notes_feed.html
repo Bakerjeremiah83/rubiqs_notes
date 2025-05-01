@@ -194,123 +194,246 @@
 
     <!-- Notes Feed -->
     <div class="feed-container">
-      {% for item in thread %}
-
-        {% if item.type == 'note' %}
-          <div class="entry note">
-            <div class="note-header">
-              <strong>Note:</strong>
-              <span class="expand-indicator">Click to expand ⬇</span>
+        {% for item in thread %}
+      
+          {% if item.type == 'note' %}
+            <div class="entry note">
+                <div class="note-header" style="justify-content: space-between;">
+                    <input
+                      type="text"
+                      class="note-title-input"
+                      value="{{ item.title or '' }}"
+                      data-timestamp="{{ item.timestamp }}"
+                      readonly
+                      style="font-weight: bold; font-size: 1.1rem; border: none; background: transparent; outline: none;"
+                    >
+                    <span class="expand-indicator" onclick="toggleNoteExpand(this)">Click to expand ⬇</span>
+                  </div>
+      
+              <div class="note-body" style="display: none;">
+                <textarea id="note-{{ item.timestamp|replace(':','')|replace('-','')|replace('.','') }}" class="form-textarea rich-text" readonly data-timestamp="{{ item.timestamp }}">{{ item.text|safe }}</textarea>
+                <div style="margin-top: 0.5rem;">
+                  <button class="tab-button" onclick="enableNoteEdit(this)">✏️ Edit</button>
+                  <button class="tab-button" onclick="saveEditedNote(this)" style="display: none;">💾 Save</button>
+                </div>
+              </div>              
+      
+              {% if item.comments %}
+                <div class="comment-thread">
+                  {% for c in item.comments %}
+                    <div style="font-size: 0.9rem; color: #333; margin-bottom: 1rem;">
+                      💬 <em>{{ c.text }}</em><br>
+                      <span style="font-size: 0.75rem; color: #888;">{{ c.timestamp }}</span>
+      
+                      {% if c.replies %}
+                        <div style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid #ccc;">
+                          {% for r in c.replies %}
+                            <div style="margin-bottom: 0.25rem;">
+                              🗣️ <strong>{{ r.author.capitalize() }}:</strong> {{ r.text }}<br>
+                              <span style="font-size: 0.7rem; color: #888;">{{ r.timestamp }}</span>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+      
+                      {% if not instructor_mode %}
+                        <form method="POST" action="/notes/reply" class="reply-form" style="margin-top: 0.5rem;">
+                          <input type="hidden" name="user_id" value="{{ user_id }}">
+                          <input type="hidden" name="note_timestamp" value="{{ item.timestamp }}">
+                          <input type="hidden" name="comment_timestamp" value="{{ c.timestamp }}">
+                          <textarea name="reply" rows="2" placeholder="Write a reply..."></textarea>
+                          <button type="submit" class="submit-button">Reply</button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+      
+              <div class="timestamp">{{ item.timestamp }}</div>
+      
+              {% if instructor_mode %}
+                <form method="POST" action="/notes/comment" style="margin-top: 1rem;">
+                  <input type="hidden" name="user_id" value="{{ user_id }}">
+                  <input type="hidden" name="note_timestamp" value="{{ item.timestamp }}">
+                  <textarea name="comment" rows="2" placeholder="Add a comment..." style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;"></textarea>
+                  <button type="submit" class="submit-button">Add Comment</button>
+                </form>
+              {% endif %}
             </div>
-            <div class="note-body">{{ item.text }}</div>
-
-            {% if item.comments %}
-              <div class="comment-thread">
-                {% for c in item.comments %}
-                  <div style="font-size: 0.9rem; color: #333; margin-bottom: 1rem;">
-                    💬 <em>{{ c.text }}</em><br>
-                    <span style="font-size: 0.75rem; color: #888;">{{ c.timestamp }}</span>
-
-                    {% if c.replies %}
-                      <div style="margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid #ccc;">
-                        {% for r in c.replies %}
-                          <div style="margin-bottom: 0.25rem;">
-                            🗣️ <strong>{{ r.author.capitalize() }}:</strong> {{ r.text }}<br>
-                            <span style="font-size: 0.7rem; color: #888;">{{ r.timestamp }}</span>
-                          </div>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-
-                    {% if not instructor_mode %}
-                      <form method="POST" action="/notes/reply" class="reply-form" style="margin-top: 0.5rem;">
-                        <input type="hidden" name="user_id" value="{{ user_id }}">
-                        <input type="hidden" name="note_timestamp" value="{{ item.timestamp }}">
-                        <input type="hidden" name="comment_timestamp" value="{{ c.timestamp }}">
-                        <textarea name="reply" rows="2" placeholder="Write a reply..."></textarea>
-                        <button type="submit" class="submit-button">Reply</button>
-                      </form>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-
-            <div class="timestamp">{{ item.timestamp }}</div>
-
-            {% if instructor_mode %}
-              <form method="POST" action="/notes/comment" style="margin-top: 1rem;">
-                <input type="hidden" name="user_id" value="{{ user_id }}">
-                <input type="hidden" name="note_timestamp" value="{{ item.timestamp }}">
-                <textarea name="comment" rows="2" placeholder="Add a comment..." style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;"></textarea>
-                <button type="submit" class="submit-button">Add Comment</button>
-              </form>
-            {% endif %}
-          </div>
-
-        {% elif item.type == 'assignment' %}
-          <div class="entry assignment">
-            <div><strong>{{ item.title }}</strong></div>
-
-            {% for q in item.prompt %}
-              <div class="assignment-question">{{ q }}</div>
-            {% endfor %}
-
-            {% if item.assignment_id not in submitted_assignments %}
-              <form method="POST" action="/notes/respond?assignment_id={{ item.assignment_id }}&user_id={{ user_id }}">
-                {% for q in item.prompt %}
-                  <div class="assignment-question">
-                    <label>{{ q }}</label>
-                    <textarea name="q{{ loop.index }}" rows="3" placeholder="Your answer..."></textarea>
-                  </div>
-                {% endfor %}
-                <button type="submit" class="submit-button">Submit Assignment</button>
-              </form>
-
-            {% elif item.assignment_id in response_map %}
-              <div class="entry response" style="margin-top: 1.5rem;">
-                <div><strong>Your Response:</strong></div>
-                {% for qid, answer in response_map[item.assignment_id].answers.items() %}
-                  <p>{{ qid }}. {{ answer }}</p>
-                {% endfor %}
-                <div class="timestamp">{{ response_map[item.assignment_id].timestamp }}</div>
-              </div>
-
-            {% else %}
-              <div style="margin-top: 1rem; color: green; font-weight: bold;">✅ Assignment Submitted</div>
-            {% endif %}
-
-            <div class="timestamp">{{ item.timestamp }}</div>
-          </div>
-
-        {% elif item.type == 'response' %}
-          <div class="entry response">
-            <div><strong>Your Response:</strong></div>
-            {% for qid, answer in item.answers.items() %}
-              <p>{{ qid }}. {{ answer }}</p>
-            {% endfor %}
-            <div class="timestamp">{{ item.timestamp }}</div>
-          </div>
-        {% endif %}
-
-      {% endfor %}
-    </div>
+      
+          {% elif item.type == 'assignment' %}
+            <div class="entry assignment">
+              <div><strong>{{ item.title }}</strong></div>
+      
+              {% if item.assignment_id not in submitted_assignments %}
+                <form method="POST" action="/notes/respond">
+                  <input type="hidden" name="user_id" value="{{ user_id }}">
+                  <input type="hidden" name="assignment_id" value="{{ item.assignment_id or item.id }}">
+      
+                  {% for q in item.prompt %}
+                    <div class="assignment-question">
+                      <div class="question-label" style="margin-bottom: 0.5rem;">{{ q|safe }}</div>
+                      <textarea id="answer-{{ loop.index }}" name="q{{ loop.index }}" class="form-textarea rich-text" placeholder="Your answer..."></textarea>
+                    </div>
+                  {% endfor %}
+      
+                  <button type="submit" class="submit-button">Submit Assignment</button>
+                </form>
+      
+              {% elif item.assignment_id in response_map %}
+                <div class="entry response" style="margin-top: 1.5rem;">
+                  <div><strong>Your Response:</strong></div>
+                  {% for qid, answer in response_map[item.assignment_id].answers.items() %}
+                    <p>{{ qid }}. {{ answer|safe }}</p>
+                  {% endfor %}
+                  <div class="timestamp">{{ response_map[item.assignment_id].timestamp }}</div>
+                </div>
+      
+              {% else %}
+                <div style="margin-top: 1rem; color: green; font-weight: bold;">✅ Assignment Submitted</div>
+              {% endif %}
+      
+              <div class="timestamp">{{ item.timestamp }}</div>
+            </div>
+      
+          {% elif item.type == 'response' %}
+            <div class="entry response">
+              <div><strong>Your Response:</strong></div>
+              {% for qid, answer in item.answers.items() %}
+                <p>{{ qid }}. {{ answer|safe }}</p>
+              {% endfor %}
+              <div class="timestamp">{{ item.timestamp }}</div>
+            </div>
+          {% endif %}
+      
+        {% endfor %}
+      </div>
+      
 
     <!-- Note Entry Form -->
-    <form method="POST" action="/notes/add-note?user_id={{ user_id }}">
-      <textarea name="note" rows="4" class="form-control" placeholder="Add a new note..." style="width: 100%; padding: 0.75rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc;"></textarea>
-      <button type="submit" class="submit-button" style="margin-top: 1rem;">Add Note</button>
-    </form>
+    <form method="POST" action="/notes/add-note?user_id={{ user_id }}" style="margin-top: 2rem;">
+        <textarea id="student-note-1" name="note" class="form-textarea rich-text" placeholder="Add a new note..."></textarea>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button type="submit" class="submit-button">Save Note</button>
+          <button type="button" class="submit-button" onclick="addNewNoteEditor()">New Note</button>
+        </div>
+      </form>
+      
   </div>
 
+  <script src="https://cdn.tiny.cloud/1/{{ tinymce_api_key }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll('.entry.note').forEach(note => {
-        note.addEventListener('click', () => {
-          note.classList.toggle('expanded');
-        });
-      });
+    tinymce.init({
+      selector: '.rich-text',
+      plugins: 'image table lists link',
+      toolbar: 'undo redo | bold italic | fontsize forecolor | alignleft aligncenter alignright | bullist numlist | table | link image',
+      menubar: false
     });
+  
+    function addNewNoteEditor() {
+      const form = document.querySelector('form[action*="add-note"]');
+      const count = document.querySelectorAll('.rich-text').length + 1;
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = `
+        <textarea id="student-note-${count}" name="note" class="form-textarea rich-text" placeholder="Add a new note..."></textarea>`;
+      form.insertBefore(wrapper, form.querySelector('div'));
+      tinymce.init({ selector: `#student-note-${count}` });
+    }
   </script>
+  
+  <script>
+    function enableNoteEdit(button) {
+        const wrapper = button.closest('.entry.note');
+        const container = wrapper.querySelector('.note-body');
+        const editor = container.querySelector('textarea');
+        const saveBtn = container.querySelector('button:nth-child(2)');
+        const titleInput = wrapper.querySelector('.note-title-input');
+        if (titleInput) titleInput.removeAttribute('readonly');
+
+
+        const tiny = tinymce.get(editor.id);
+        if (tiny) {
+            wrapper.classList.add('editing');
+            editor.removeAttribute('readonly');
+            tiny.setMode('design');
+            button.style.display = 'none';
+            saveBtn.style.display = 'inline-block';
+        }
+        }
+  </script>
+   
+
+<script>
+    function saveEditedNote(button) {
+        const container = button.closest('.note-body');
+        const wrapper = button.closest('.entry.note');
+        const editor = container.querySelector('textarea');
+        const noteContent = tinymce.get(editor.id).getContent();
+        const saveBtn = button;
+        const editBtn = container.querySelector('button:nth-child(1)');
+        const timestamp = editor.dataset.timestamp;
+        const titleInput = wrapper.querySelector('.note-title-input');
+        const updatedTitle = titleInput ? titleInput.value : "";
+        titleInput.setAttribute('readonly', true);
+
+        fetch("/notes/update-note", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+            user_id: "{{ user_id }}",
+            timestamp: timestamp,
+            updated_text: noteContent,
+            updated_title: updatedTitle
+            })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to save note.");
+            return res.json();
+        })
+        .then(() => {
+            editor.setAttribute('readonly', true);
+            tinymce.get(editor.id).setMode('readonly');
+            saveBtn.style.display = 'none';
+            editBtn.style.display = 'inline-block';
+            wrapper.classList.remove('editing');
+        })
+        .catch(err => {
+            alert("❌ Error saving note: " + err.message);
+            console.error("Save failed:", err);
+        });
+        }
+
+
+  </script>
+  
+  <script>
+    function toggleNoteExpand(button) {
+        const wrapper = button.closest('.entry.note');
+        if (wrapper.classList.contains('editing')) return;
+
+        const body = wrapper.querySelector('.note-body');
+        const isHidden = body.style.display === 'none';
+        const editor = body.querySelector('textarea');
+
+        // Show or hide the note body
+        body.style.display = isHidden ? 'block' : 'none';
+        button.textContent = isHidden ? 'Click to collapse ⬆' : 'Click to expand ⬇';
+
+        // Initialize TinyMCE if it's not already initialized
+        if (isHidden && editor && !tinymce.get(editor.id)) {
+            console.log("🔄 Initializing TinyMCE for:", editor.id);
+            tinymce.init({
+            selector: `#${editor.id}`,
+            plugins: 'image table lists link',
+            toolbar: 'undo redo | bold italic | fontsize forecolor | alignleft aligncenter alignright | bullist numlist | table | link image',
+            menubar: false,
+            readonly: 1
+            });
+        }
+        }
+
+  </script>
+  
 </body>
 </html>

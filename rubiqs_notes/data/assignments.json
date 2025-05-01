@@ -1,115 +1,38 @@
 [
   {
-    "id": "a1",
-    "title": "Unit 1: What is History?",
-    "prompt": "This is a test.",
-    "created_at": "2025-04-19T01:27:32.590795"
-  },
-  {
-    "id": "a2",
-    "title": "Unit 1: What is History?",
-    "prompt": "Answer the essential questions from the module.",
-    "created_at": "2025-04-19T01:31:52.212516"
-  },
-  {
-    "id": "a3",
-    "title": "World War 1",
-    "prompt": "1. **Origins and Influences:** World War I was caused due to a complex interplay of various factors. In brief, list and describe three main events or conditions that led to the outbreak of World War I. How did the alliances made between countries contribute to the overall conflict? \r\n\r\n2. **Role of the Assassination:** Many historians highlight the assassination of Archduke Franz Ferdinand of Austria-Hungary as the spark that led to World War I. Why was this event so significant? Explain the connection between this incident and the start of the war, detailing the response of the international community.\r\n\r\n3. **Nationalism and Imperialism:** Discuss the roles nationalism and imperialism played in causing or speeding up the start of World War I. How did these factors lead to growing tensions between different countries and regions? Include in your response an explanation of how the quest for power and territorial control amplified during this period.",
-    "created_at": "2025-04-19T02:35:23.025863"
-  },
-  {
-    "id": "a4",
-    "title": "What Time Is It?",
-    "prompt": "Study Guide Prompt: Obscure Ways of Telling Time\r\n\r\n1. Sundial Mystery: You stumble upon an ancient sundial with no markings left. The shadow it casts points towards the left. If the sun rises in the east and sets in the west, what time of day could it most likely be? Please provide a range of time rather than an exact time.\r\n\r\n2. Kukuku Challenge: Kukuklok is an online alarm clock that uses chicken noises instead of traditional alarm sounds. Your alarm clucks 8 times every hour. If you hear it cluck 5 times, what hour could it possibly be?\r\n\r\n3. The Timely Equation: You've discovered an old riddle 'The peddler told me, I am four scores less six when the moon is at its zenith.' When could the 'moon be at its zenith' on an average day? Remember a \"score\" is an old-fashioned term that means 20 years.\r\n\r\n4. Enchanted Hourglass: In a quirky little corner of a vintage shop, you find an hourglass which runs out of sand every 45 minutes. If you turn it over exactly when it runs out, how many times will you have to turn it over between 1:15 PM and 6:00 PM?\r\n\r\nRemember, these questions aim to assess your ability to think critically about unique ways people could measure time. Have fun as you wrack your brain, and remember, time waits for no one!",
-    "created_at": "2025-04-19T02:44:32.040789"
-  },
-  {
-    "id": "a5",
-    "title": "Image test",
-    "prompt": "",
-    "created_at": "2025-04-19T13:06:15.484209"
-  },
-  {
-    "id": "a6",
-    "title": "Image test",
-    "prompt": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Water_Cycle_diagram.svg/1024px-Water_Cycle_diagram.svg.png\r\n",
-    "created_at": "2025-04-19T13:06:33.319494"
-  },
-  {
-    "id": "a7",
-    "title": "Ok, this one should work.",
+    "assignment_id": "a2",
+    "title": "Study Guide Notes",
     "prompt": [
-      "Ok, this one should work. "
+      "<div>\r\n<div>1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)</div>\r\n</div>",
+      "<div>\r\n<div>2. Please fill out this table using the information from the course.</div>\r\n<div>\r\n<table style=\"border-collapse: collapse; width: 100.032%;\" border=\"1\"><colgroup><col style=\"width: 49.867%;\"><col style=\"width: 49.867%;\"></colgroup>\r\n<tbody>\r\n<tr>\r\n<td><strong>Test</strong></td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>Test</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n</div>"
     ],
     "image_url": "",
     "lms_assignment_id": "",
-    "created_at": "2025-04-20T23:30:51.070163",
+    "created_at": "2025-04-21T18:45:38.310178",
     "type": "assignment"
   },
   {
-    "id": "a8",
-    "title": "Module 3 Study Guide US History, Part 1",
+    "assignment_id": "a2",
+    "title": "Study Guide Notes",
     "prompt": [
-      "1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)"
+      "<div>\r\n<div>1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)</div>\r\n</div>",
+      "<div>\r\n<div>2. Please fill out this table using the information from the course.</div>\r\n<div>\r\n<table style=\"border-collapse: collapse; width: 100.032%;\" border=\"1\"><colgroup><col style=\"width: 49.867%;\"><col style=\"width: 49.867%;\"></colgroup>\r\n<tbody>\r\n<tr>\r\n<td><strong>Test</strong></td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>Test</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n</div>"
     ],
     "image_url": "",
     "lms_assignment_id": "",
-    "created_at": "2025-04-20T23:37:32.779521",
+    "created_at": "2025-04-21T19:20:45.340961",
     "type": "assignment"
   },
   {
-    "id": "a9",
-    "title": "Module 3 Study Guide US History, Part 1",
+    "assignment_id": "a3",
+    "title": "Study Guide Notes",
     "prompt": [
-      "1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)"
+      "<div>\r\n<div>1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)</div>\r\n</div>",
+      "<div>\r\n<div>2. Please fill out this table using the information from the course.</div>\r\n<div>\r\n<table style=\"border-collapse: collapse; width: 100.032%;\" border=\"1\"><colgroup><col style=\"width: 49.867%;\"><col style=\"width: 49.867%;\"></colgroup>\r\n<tbody>\r\n<tr>\r\n<td><strong>Test</strong></td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>Test</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n<tr>\r\n<td>&nbsp;</td>\r\n<td>&nbsp;</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n</div>"
     ],
     "image_url": "",
     "lms_assignment_id": "",
-    "created_at": "2025-04-20T23:41:16.176606",
-    "type": "assignment"
-  },
-  {
-    "id": "a10",
-    "title": "Module 3 Study Guide US History, Part 1",
-    "prompt": [
-      "1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)"
-    ],
-    "image_url": "",
-    "lms_assignment_id": "",
-    "created_at": "2025-04-20T23:42:58.997446",
-    "type": "assignment"
-  },
-  {
-    "id": "a11",
-    "title": "Module 3 Study Guide US History, Part 1",
-    "prompt": [
-      "1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)"
-    ],
-    "image_url": "",
-    "lms_assignment_id": "",
-    "created_at": "2025-04-20T23:46:56.138030",
-    "type": "assignment"
-  },
-  {
-    "id": "a12",
-    "title": "Module 3 Study Guide US History, Part 1",
-    "prompt": [
-      "1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)"
-    ],
-    "image_url": "",
-    "lms_assignment_id": "",
-    "created_at": "2025-04-20T23:56:01.480105",
-    "type": "assignment"
-  },
-  {
-    "id": "a13",
-    "title": "Module 3 Study Guide US History, Part 1",
-    "prompt": [
-      "1. Describe how tobacco changed everything in the south. (Explain in 2-3 sentences.)"
-    ],
-    "image_url": "",
-    "lms_assignment_id": "",
-    "created_at": "2025-04-21T00:08:27.987809",
+    "created_at": "2025-04-21T19:32:56.921112",
     "type": "assignment"
   }
 ]
