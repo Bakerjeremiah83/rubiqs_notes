@@ -22,7 +22,7 @@ from notes_storage import (
 
 notes_bp = Blueprint('notes', __name__)
 instructor_bp = Blueprint('instructor_dashboard', __name__)
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 
 DATA_DIR = "rubiqs_notes/data"
