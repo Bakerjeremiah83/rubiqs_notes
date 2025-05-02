@@ -50,21 +50,29 @@ def lti_launch():
     )
     import os
 
+    print("✅ /launch route hit")
+
     TINYMCE_API_KEY = os.getenv("TINYMCE_API_KEY")
 
     id_token = request.form.get("id_token")
     if not id_token:
+        print("❌ Missing ID token in launch")
         return "Missing ID token", 400
 
+    print("✅ ID token received. Decoding...")
     decoded = jwt.decode(id_token, options={"verify_signature": False})
+    print("✅ Decoded token:")
+    print(decoded)
+
     user_name = decoded.get("name", "Anonymous")
-    user_id = decoded.get("sub", "test-user")  # fallback
+    user_id = decoded.get("sub", "test-user")
     roles = decoded.get("https://purl.imsglobal.org/spec/lti/claim/roles", [])
+
+    print(f"👤 user_id: {user_id}, roles: {roles}")
 
     session["user"] = user_name
     session["roles"] = roles
 
-    # Optional: handle instructors differently later
     assignments = load_assignments()
     selected_assignment_id = ""
     assignment_prompt = ""
@@ -83,6 +91,8 @@ def lti_launch():
 
     saved_feedback = load_feedback(user_id)
     is_submitted = is_assignment_submitted(user_id, selected_assignment_id)
+
+    print("✅ Launch rendering notes_home.html")
 
     return render_template(
         "notes_home.html",
