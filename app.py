@@ -50,20 +50,17 @@ def lti_launch():
     if not id_token:
         return "Missing ID token", 400
 
+    print("✅ /launch route hit. Token received.")
+
     decoded = jwt.decode(id_token, options={"verify_signature": False})
-    issuer = decoded.get("iss")
-    client_id = decoded.get("aud")
-    deployment_id = decoded.get("https://purl.imsglobal.org/spec/lti/claim/deployment_id")
+    print("✅ Decoded token:")
+    print(decoded)
 
-    platform = PLATFORMS.get("moodle")
-    if not platform or client_id != platform["client_id"]:
-        return "Unknown or mismatched platform", 400
-
-    # Store info in session if needed
     session["user"] = decoded.get("name", "Anonymous")
     session["roles"] = decoded.get("https://purl.imsglobal.org/spec/lti/claim/roles", [])
 
     return redirect("/notes/student-notes")
+
 
 
 if __name__ == '__main__':
