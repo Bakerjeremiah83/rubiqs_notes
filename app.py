@@ -44,35 +44,50 @@ def login():
 def lti_launch():
     from flask import request, session, render_template
     import jwt
-    from notes_storage import (
-        load_notes, save_notes, load_feedback, load_assignments,
-        is_assignment_submitted, load_inline_comments
-    )
     import os
-
-    print("✅ /launch route hit")
+    from notes_storage import (
+        load_notes, load_feedback, load_assignments,
+        is_assignment_submitted, load_inline_comments,
+        get_all_note_users, count_note_submissions
+    )
 
     TINYMCE_API_KEY = os.getenv("TINYMCE_API_KEY")
 
     id_token = request.form.get("id_token")
     if not id_token:
-        print("❌ Missing ID token in launch")
         return "Missing ID token", 400
 
-    print("✅ ID token received. Decoding...")
     decoded = jwt.decode(id_token, options={"verify_signature": False})
-    print("✅ Decoded token:")
-    print(decoded)
-
     user_name = decoded.get("name", "Anonymous")
     user_id = decoded.get("sub", "test-user")
     roles = decoded.get("https://purl.imsglobal.org/spec/lti/claim/roles", [])
 
-    print(f"👤 user_id: {user_id}, roles: {roles}")
-
     session["user"] = user_name
     session["roles"] = roles
 
+    # ✅ If instructor, show dashboard
+    if any(role.lower() in r.lower() for r in roles for role in ["instructor", "teacher"]):
+        assignments = load_assignments()
+        students = get_all_note_users()
+        submission_map = {}
+
+        for a in assignments:
+            a_id = a.get('assignment_id') or a.get('id')
+            submission_map[a_id] = {}
+            for student_id in students:
+                submitted = is_assignment_submitted(student_id, a_id)
+                submission_map[a_id][student_id] = submitted
+
+        return render_template(
+            'notes_instructor_dashboard.html',
+            tinymce_api_key=TINYMCE_API_KEY,
+            assignments=assignments,
+            students=students,
+            submission_map=submission_map,
+            total_submissions=count_note_submissions()
+        )
+
+    # ✅ Otherwise, render student notes view
     assignments = load_assignments()
     selected_assignment_id = ""
     assignment_prompt = ""
@@ -92,8 +107,6 @@ def lti_launch():
     saved_feedback = load_feedback(user_id)
     is_submitted = is_assignment_submitted(user_id, selected_assignment_id)
 
-    print("✅ Launch rendering notes_home.html")
-
     return render_template(
         "notes_home.html",
         tinymce_api_key=TINYMCE_API_KEY,
@@ -107,9 +120,6 @@ def lti_launch():
         inline_comments=inline_comments,
         highlighted_notes=highlighted_notes
     )
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
