@@ -46,11 +46,15 @@ def login():
     return redirect(redirect_url)
 
 
-@app.route('/launch', methods=['POST'])
+@app.route('/launch', methods=['GET', 'POST'])
 def lti_launch():
     from flask import request
-    print("🚀 Received launch request with method:", request.method)
 
+    if request.method == 'GET':
+        print("👀 MoodleBot GET check hit /launch")
+        return "✅ Rubiqs Notes is live and accepting POST launches."
+
+    print("🚀 Received LTI launch POST request")
     return """
     <html>
       <head><title>Rubiqs Notes</title></head>
@@ -60,6 +64,7 @@ def lti_launch():
       </body>
     </html>
     """
+
 
 
 
