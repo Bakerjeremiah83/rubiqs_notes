@@ -503,7 +503,7 @@ def update_note_route():
     return jsonify({'success': True})
 
 @notes_bp.route('/student-notes', methods=['GET', 'POST'])
-def launch_notes():
+def student_notes_view():
     user_id = request.args.get('user_id', 'test-user')
     assignments = load_assignments()
     selected_assignment_id = request.args.get('assignment_id', '')
