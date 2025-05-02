@@ -60,15 +60,15 @@ def lti_launch():
         return "✅ Rubiqs Notes is live and accepting POST launches."
 
     print("🚀 Received LTI launch POST request")
-    return """
-    <html>
-      <head><title>Rubiqs Notes</title></head>
-      <body>
-        <h1>✅ Rubiqs Notes launched via LTI</h1>
-        <p>If you see this, Moodle has successfully posted to /launch.</p>
-      </body>
-    </html>
-    """
+    print("📦 Request form data:", request.form)
+
+    id_token = request.form.get("id_token")
+    if not id_token:
+        print("❌ No id_token in launch")
+        return "Missing ID token", 400
+
+    return "<h1>✅ Received LTI Launch with ID Token</h1>"
+
 
 
 
