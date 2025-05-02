@@ -11,6 +11,11 @@ app.register_blueprint(notes_bp, url_prefix='/notes')
 app.register_blueprint(instructor_bp, url_prefix='/instructor')
 app.register_blueprint(review_bp, url_prefix='/review')
 
+@app.before_request
+def log_every_request():
+    from flask import request
+    print(f"📥 {request.method} {request.path}")
+
 
 @app.route('/login', methods=['POST'])
 def login():
