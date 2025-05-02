@@ -501,3 +501,54 @@ def update_note_route():
         json.dump(thread, f, indent=2)
 
     return jsonify({'success': True})
+
+@notes_bp.route('/student-notes', methods=['GET', 'POST'])
+def launch_notes():
+    user_id = request.args.get('user_id', 'test-user')
+    assignments = load_assignments()
+    selected_assignment_id = request.args.get('assignment_id', '')
+    assignment_prompt = ''
+
+    if selected_assignment_id:
+        for a in assignments:
+            if a['id'] == selected_assignment_id:
+                assignment_prompt = a['prompt']
+                break
+
+    if request.method == 'POST':
+        action = request.form.get("action")
+        if action == "submit":
+            submit_assignment(user_id, selected_assignment_id)
+        else:
+            notes_text = request.form.get('notes', '')
+            save_notes(user_id, selected_assignment_id, notes_text)
+        return redirect(url_for('notes.launch_notes', user_id=user_id, assignment_id=selected_assignment_id))
+
+    raw_notes = load_notes(user_id, selected_assignment_id)
+    inline_comments = load_inline_comments(user_id, selected_assignment_id)
+    highlighted_notes = raw_notes
+
+    for c in inline_comments:
+        if c["anchor"] in highlighted_notes:
+            comment_html = (
+                f'<span class="inline-comment-anchor">{c["anchor"]}</span>'
+                f'<span class="inline-comment-bubble" onclick="this.classList.toggle(\'open\')">💬<span class="bubble-content">{c["comment"]}</span></span>'
+            )
+            highlighted_notes = highlighted_notes.replace(c["anchor"], comment_html, 1)
+
+    saved_feedback = load_feedback(user_id)
+    is_submitted = is_assignment_submitted(user_id, selected_assignment_id)
+
+    return render_template(
+        'notes_home.html',
+        tinymce_api_key=TINYMCE_API_KEY,
+        user_id=user_id,
+        saved_notes=raw_notes,
+        saved_feedback=saved_feedback,
+        assignments=assignments,
+        selected_assignment_id=selected_assignment_id,
+        assignment_prompt=assignment_prompt,
+        is_submitted=is_submitted,
+        inline_comments=inline_comments,
+        highlighted_notes=highlighted_notes
+    )
