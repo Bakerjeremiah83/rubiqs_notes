@@ -1,4 +1,5 @@
 from flask import Flask
+
 from notes_routes import notes_bp
 from instructor_dashboard_routes import instructor_bp
 from assignment_review_routes import review_bp
@@ -43,6 +44,13 @@ def login():
     print("🔁 Redirecting to:", redirect_url)
 
     return redirect(redirect_url)
+
+
+@app.route('/launch', methods=['POST'])
+def lti_launch():
+    from flask import request
+    print("🚀 Received launch request with method:", request.method)
+    return "✅ Hello from Rubiqs Notes launch"
 
 
 if __name__ == '__main__':
