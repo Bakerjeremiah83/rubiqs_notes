@@ -42,24 +42,62 @@ def login():
 
 @app.route('/launch', methods=['POST'])
 def lti_launch():
-    from flask import request, redirect, session
-    from utils.lti_platforms import PLATFORMS
+    from flask import request, session, render_template
     import jwt
+    from notes_storage import (
+        load_notes, save_notes, load_feedback, load_assignments,
+        is_assignment_submitted, load_inline_comments
+    )
+    import os
+
+    TINYMCE_API_KEY = os.getenv("TINYMCE_API_KEY")
 
     id_token = request.form.get("id_token")
     if not id_token:
         return "Missing ID token", 400
 
-    print("✅ /launch route hit. Token received.")
-
     decoded = jwt.decode(id_token, options={"verify_signature": False})
-    print("✅ Decoded token:")
-    print(decoded)
+    user_name = decoded.get("name", "Anonymous")
+    user_id = decoded.get("sub", "test-user")  # fallback
+    roles = decoded.get("https://purl.imsglobal.org/spec/lti/claim/roles", [])
 
-    session["user"] = decoded.get("name", "Anonymous")
-    session["roles"] = decoded.get("https://purl.imsglobal.org/spec/lti/claim/roles", [])
+    session["user"] = user_name
+    session["roles"] = roles
 
-    return redirect("/notes/student-notes")
+    # Optional: handle instructors differently later
+    assignments = load_assignments()
+    selected_assignment_id = ""
+    assignment_prompt = ""
+
+    raw_notes = load_notes(user_id, selected_assignment_id)
+    inline_comments = load_inline_comments(user_id, selected_assignment_id)
+    highlighted_notes = raw_notes
+
+    for c in inline_comments:
+        if c["anchor"] in highlighted_notes:
+            comment_html = (
+                f'<span class="inline-comment-anchor">{c["anchor"]}</span>'
+                f'<span class="inline-comment-bubble" onclick="this.classList.toggle(\'open\')">💬<span class="bubble-content">{c["comment"]}</span></span>'
+            )
+            highlighted_notes = highlighted_notes.replace(c["anchor"], comment_html, 1)
+
+    saved_feedback = load_feedback(user_id)
+    is_submitted = is_assignment_submitted(user_id, selected_assignment_id)
+
+    return render_template(
+        "notes_home.html",
+        tinymce_api_key=TINYMCE_API_KEY,
+        user_id=user_id,
+        saved_notes=raw_notes,
+        saved_feedback=saved_feedback,
+        assignments=assignments,
+        selected_assignment_id=selected_assignment_id,
+        assignment_prompt=assignment_prompt,
+        is_submitted=is_submitted,
+        inline_comments=inline_comments,
+        highlighted_notes=highlighted_notes
+    )
+
 
 
 
