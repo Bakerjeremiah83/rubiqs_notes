@@ -50,7 +50,17 @@ def login():
 def lti_launch():
     from flask import request
     print("🚀 Received launch request with method:", request.method)
-    return "✅ Hello from Rubiqs Notes launch"
+
+    return """
+    <html>
+      <head><title>Rubiqs Notes</title></head>
+      <body>
+        <h1>✅ Rubiqs Notes launched via LTI</h1>
+        <p>If you see this, Moodle has successfully posted to /launch.</p>
+      </body>
+    </html>
+    """
+
 
 
 if __name__ == '__main__':
